@@ -16,7 +16,7 @@ export class ChatGateWay {
 
 
     @SubscribeMessage('joinRoom')
-    joinRoom(
+      async joinRoom(
         @MessageBody() rawData: any,
         @ConnectedSocket() client: Socket,
     ) {
@@ -29,13 +29,20 @@ export class ChatGateWay {
             return;
         }
 
+
         console.log("user joined room", data.roomId);
 
         client.join(data.roomId);
 
+        const history = await this.chatService.getRoomMessages(data.roomId)
+
+        
+
         console.log(`Client joined room: ${data.roomId}`);
 
         client.emit("joinedRoom", { roomId: data.roomId });
+
+        client.emit('roomHistory',history);
     }
 
 
