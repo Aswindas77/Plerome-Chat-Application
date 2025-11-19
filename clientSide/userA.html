@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User A</title>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+  <h3>User A</h3>
+
+  <input id="room" placeholder="Room ID" value="123"  hidden/>
+  <br /><br />
+
+  <input id="msg" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  
+  <div id="sent" hidden></div>
+
+  <h4>Received Messages:</h4>
+  <div id="received"></div>
+
+  <script>
+    const socket = io("http://localhost:3001");
+
+    socket.on("connect", () => {
+      console.log("UserA connected:", socket.id);
+      socket.emit("joinRoom", { roomId: "123" });
+    });
+
+   
+    function sendMessage() {
+      const roomId = document.getElementById("room").value;
+      const message = document.getElementById("msg").value;
+
+      socket.emit("sendMessage", {
+        roomId,
+        text:message,
+        senderId: "UserA"
+      });
+
+      document.getElementById("sent").innerHTML += 
+        `<p><b>You:</b> ${message}</p>`;
+
+      document.getElementById("msg").value = "";
+    }
+
+    
+    socket.on("receiveMessage", (msg) => {
+      document.getElementById("received").innerHTML += 
+        `<p><b>${msg.senderId}:</b> ${msg.text}</p>`;
+    });
+  </script>
+
+</body>
+</html>
